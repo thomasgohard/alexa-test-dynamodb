@@ -1,0 +1,1 @@
+# alexa-test-dynamodb
