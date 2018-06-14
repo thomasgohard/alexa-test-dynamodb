@@ -1,0 +1,43 @@
+{
+  "interactionModel": {
+    "languageModel": {
+      "invocationName": "dynamodb test",
+      "types": [
+
+      ],
+      "intents": [
+        {
+          "name": "AMAZON.CancelIntent",
+          "samples": [
+
+          ]
+        },
+        {
+          "name": "AMAZON.HelpIntent",
+          "samples": [
+
+          ]
+        },
+        {
+          "name": "AMAZON.StopIntent",
+          "samples": [
+
+          ]
+        },
+        {
+          "name": "GetArtistIntent",
+          "slots": [
+            {
+              "name": "songName",
+              "type": "AMAZON.SearchQuery"
+            }
+          ],
+          "samples": [
+            "Who recorded the song {songName}",
+            "Who wrote the song {songName}"
+          ]
+        }
+      ]
+    }
+  }
+}
