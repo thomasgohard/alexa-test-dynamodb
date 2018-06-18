@@ -25,10 +25,10 @@ const GetArtistIntentHandler = {
     return handlerInput.requestEnvelope.request.type === 'IntentRequest'
       && handlerInput.requestEnvelope.request.intent.name === 'GetArtistIntent';
   },
-  handle(handlerInput) {
+  async handle(handlerInput) {
     const songName = handlerInput.requestEnvelope.request.intent.slots['songName'].value;
-    const speechText = 'The artist who made the song ' + songName + ' is ' + findSongName(songName);
-
+    const speechText = 'The artist who made the song ' + songName + ' is ' + await getArtist(songName);
+    console.log("GetArtistIntentHandler about to return: " + speechText);
     return handlerInput.responseBuilder
       .speak(speechText)
       .withSimpleCard('Music database', speechText)
@@ -93,26 +93,28 @@ const ErrorHandler = {
   },
 };
 
-function findSongName(name) {
-  let params = {
-    TableName: 'Music',
-    KeyConditionExpression: "SongTitle = :s",
-    ExpressionAttributeValues: {
-      ":s": "One Dance"
-    }
-  }
+function scanDb(params) {
+  return docClient.scan(params).promise();
+}
 
-  var promise = docClient.query(params).promise();
-  promise.then(
-    function(data) {
-      console.log("Promise: " + data);
+async function getArtist(songName) {
+  var artist = 'unknown';
+
+  var params = {
+    TableName: 'Music',
+    FilterExpression: 'contains (SongTitle, :s)',
+    ExpressionAttributeValues: {
+      ':s': 'One Dance'
     },
-    function(error) {
-      console.log("Promise: " + error);
-    }
-  );
+    ProjectionExpression: 'Artist'
+  };
+
+  var data = await scanDb(params);
+  if (data['Count'] >= 1) {
+    artist = data['Items'][0]['Artist'];
+  }
   
-  return "Drake";
+  return artist;
 };
 
 const skillBuilder = Alexa.SkillBuilders.custom();
